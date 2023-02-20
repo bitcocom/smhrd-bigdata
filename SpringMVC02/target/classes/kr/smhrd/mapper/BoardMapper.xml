@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="kr.smhrd.mapper.BoardMapper">
+
+  <select id="boardList" resultType="kr.smhrd.entity.Board">
+     select * from reboard order by boardGroup desc, boardSequence asc
+  </select> 
+  <!-- 원글저장 -->
+  <insert id="register" parameterType="kr.smhrd.entity.Board">
+    insert into reboard(memId,title,content,writer,boardGroup,boardSequence,boardLevel,boardAvailable)
+    select #{memId},#{title},#{content},#{writer},IFNULL(max(boardGroup)+1,0),0,0,1 
+    from reboard
+  </insert>
+  
+  <!-- 답글저장SQL -->
+  <insert id="replyInsert" parameterType="kr.smhrd.entity.Board">
+    insert into reboard(memId,title,content,writer,boardGroup,boardSequence,boardLevel,boardAvailable)
+    values(#{memId},#{title},#{content},#{writer},#{boardGroup},#{boardSequence},#{boardLevel},1)
+  </insert>
+  
+  
+   <select id="content" parameterType="int" resultType="kr.smhrd.entity.Board">
+      select * from reboard where idx = #{idx}
+   </select>  
+   
+   <!-- 답글순서 업데이트 -->
+   <update id="replySeqUpdate" parameterType="kr.smhrd.entity.Board">
+      update reboard set boardSequence = boardSequence + 1 
+      where boardGroup = #{boardGroup} and boardSequence > #{boardSequence}      
+   </update> 
+      
+</mapper>
